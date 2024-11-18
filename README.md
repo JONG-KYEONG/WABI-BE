@@ -41,9 +41,13 @@
 13. 모호한 점이 있을 경우 즉시 질문하기
 
 ### 고객 여정지도
-
+준비 예정
 
 ### CI/CD
+#### 프론트
+준비 예정
+#### 백엔드
+![image](https://github.com/user-attachments/assets/e77fef6c-2945-46bf-8474-a950e0a49df2)
 
 
 ## 👨‍💻 기여자 (Contributors)
