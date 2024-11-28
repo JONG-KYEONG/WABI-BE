@@ -29,13 +29,7 @@ class SecurityConfig(
                 .requestMatchers(
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/v3/api-docs/swagger-config",
-                    "/swagger-ui.html",
-                    "/swagger-resources/**",
-                    "/webjars/**",
-                    "/api-docs/**",
-                )
-                .permitAll()
+                ).permitAll()
                 .anyRequest().authenticated()
         }.sessionManagement { session ->
             session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
