@@ -31,7 +31,7 @@ class SwaggerConfig {
                     .bearerFormat("JWT")
             )
         return OpenAPI()
-            .addServersItem(Server().url("/"))
+            .addServersItem(Server().url("https://zepelown.site"))
             .info(info)
             .addSecurityItem(securityRequirement)
             .components(components)
