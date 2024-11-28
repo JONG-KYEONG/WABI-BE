@@ -23,6 +23,12 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
+        val path = request.requestURI
+        if (path.startsWith("/swagger-ui/") || path.startsWith("/v3/api-docs/")) {
+            filterChain.doFilter(request, response)
+            return
+        }
+
         val token = parseBearerToken(request)
 
         if (token != null && jwtTokenProvider.validateTokenAndGetSubject(token) != null) {
