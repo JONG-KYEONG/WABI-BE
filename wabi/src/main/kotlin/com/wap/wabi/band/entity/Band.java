@@ -14,11 +14,13 @@ public class Band {
     private Long adminId;
     private String bandName;
     private String bandMemo;
+    private boolean available;
 
     private Band(builder builder) {
         this.adminId = builder.adminId;
         this.bandName = builder.bandName;
         this.bandMemo = builder.bandMemo;
+        this.available = true;
     }
 
     public static class builder {
@@ -68,5 +70,13 @@ public class Band {
     public void update(BandUpdateRequest request) {
         this.bandName = request.getBandName();
         this.bandMemo = request.getBandMemo();
+    }
+
+    public void delete() {
+        this.available = false;
+    }
+
+    public boolean isAvailable() {
+        return this.available;
     }
 }

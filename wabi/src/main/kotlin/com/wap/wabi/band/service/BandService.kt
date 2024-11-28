@@ -60,20 +60,11 @@ class BandService(
             throw RestApiException(ErrorCode.UNAUTHORIZED_REQUEST)
         }
 
-        if (bandStudentRepository.findAllByBand(band).isNotEmpty()) {
-            throw RestApiException(ErrorCode.ALREADY_ADD_STUDENT)
-        }
-
         if (band.adminId != admin.get().id) {
             throw RestApiException(ErrorCode.UNAUTHORIZED_BAND)
         }
 
-        val eventBands = eventBandRepository.findAllByBand(band)
-        eventBands.forEach { eventBand ->
-            deleteEventByBand(event = eventBand.event)
-        }
-        bandStudentRepository.deleteAllByBand(band)
-        bandRepository.delete(band)
+        band.delete()
     }
 
     private fun deleteEventByBand(event: Event) {
@@ -99,7 +90,9 @@ class BandService(
         val bands: List<Band> = bandRepository.findAllByAdminId(admin.get().id)
         val bandsDatas: MutableList<BandsData> = mutableListOf()
         bands.forEach { band ->
-            bandsDatas.add(BandsData(bandId = band.id, bandName = band.bandName))
+            if (band.isAvailable()) {
+                bandsDatas.add(BandsData(bandId = band.id, bandName = band.bandName))
+            }
         }
 
         return bandsDatas
