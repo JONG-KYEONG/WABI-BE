@@ -57,21 +57,6 @@ public class EventStudent {
             return this;
         }
 
-        public builder status(EventStudentStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public builder updatedAt(LocalDateTime updatedAt) {
-            this.updatedAt = updatedAt;
-            return this;
-        }
-
-        public builder checkedInAt(LocalDateTime checkedInAt) {
-            this.checkedInAt = checkedInAt;
-            return this;
-        }
-
         public EventStudent build() {
             return new EventStudent(this);
         }
@@ -84,6 +69,21 @@ public class EventStudent {
         this.status = EventStudentStatus.CHECK_IN;
         this.checkedInAt = LocalDateTime.now();
         return this.status;
+    }
+
+    public boolean patchCheckIn() {
+        if (isCheckedIn()) {
+            this.status = EventStudentStatus.NOT_CHECK_IN;
+            this.checkedInAt = null;
+            return true;
+        }
+        this.status = EventStudentStatus.CHECK_IN;
+        this.checkedInAt = LocalDateTime.now();
+        return false;
+    }
+
+    private boolean isCheckedIn() {
+        return this.status == EventStudentStatus.CHECK_IN;
     }
 
     public Long getId() {
@@ -100,10 +100,6 @@ public class EventStudent {
 
     public EventStudentStatus getStatus() {
         return status;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public LocalDateTime getCheckedInAt() {

@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -39,10 +38,9 @@ class EventQueryController(
     @GetMapping("/{eventId}")
     @Operation(summary = "이벤트 조회")
     fun getEvent(
-        @PathVariable("eventId") eventId: Long,
-        @RequestHeader("Authorization") token: String
+        @PathVariable("eventId") eventId: Long
     ): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         val result = eventQueryService.getEvent(adminId = adminId, eventId = eventId)
 
@@ -53,9 +51,8 @@ class EventQueryController(
     @GetMapping("/list")
     @Operation(summary = "이벤트 목록 조회")
     fun getEvents(
-        @RequestHeader("Authorization") token: String
     ): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         val result = eventQueryService.getEvents(adminId = adminId)
 

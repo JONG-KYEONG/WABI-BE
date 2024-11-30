@@ -11,12 +11,14 @@ import com.wap.wabi.event.entity.EventStudentBandName
 import com.wap.wabi.event.payload.request.CheckInRequest
 import com.wap.wabi.event.payload.request.EventCreateRequest
 import com.wap.wabi.event.payload.request.EventUpdateRequest
+import com.wap.wabi.event.payload.request.InsertEventStudentRequest
 import com.wap.wabi.event.repository.EventBandRepository
 import com.wap.wabi.event.repository.EventRepository
 import com.wap.wabi.event.repository.EventStudentBandNameRepository
 import com.wap.wabi.event.repository.EventStudentRepository
 import com.wap.wabi.exception.ErrorCode
 import com.wap.wabi.exception.RestApiException
+import com.wap.wabi.student.entity.Student
 import com.wap.wabi.student.repository.StudentRepository
 import jakarta.transaction.Transactional
 import org.springframework.stereotype.Service
@@ -33,20 +35,12 @@ class EventCommandService(
 ) {
     @Transactional
     fun checkIn(checkInRequest: CheckInRequest): EventStudentStatus {
-        //TODO 해당 이벤트에 체크인할 권한이 있는지 검증 필요.
-
-        val student = studentRepository.findById(checkInRequest.studentId)
-            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_STUDENT) }
-        val event = eventRepository.findById(checkInRequest.eventId)
-            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
-        val eventStudent = eventStudentRepository.findByStudentAndEvent(student, event)
-            .orElseThrow { RestApiException(ErrorCode.UNAUTHORIZED_CHECK_IN) }
+        val eventStudent = findEventStudent(checkInRequest)
 
         if (eventStudent.status.equals(EventStudentStatus.CHECK_IN)) {
             throw RestApiException(ErrorCode.ALREADY_CHECK_IN)
         }
         return eventStudent.checkIn()
-
     }
 
     @Transactional
@@ -133,8 +127,74 @@ class EventCommandService(
         eventRepository.delete(event)
     }
 
+    @Transactional
+    fun patchCheckIn(checkInRequest: CheckInRequest): Boolean {
+        val eventStudent = findEventStudent(checkInRequest)
+
+        return eventStudent.patchCheckIn()
+    }
+
+    private fun findEventStudent(checkInRequest: CheckInRequest): EventStudent {
+        val student = studentRepository.findById(checkInRequest.studentId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_STUDENT) }
+        val event = eventRepository.findById(checkInRequest.eventId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
+        val eventStudent = eventStudentRepository.findByStudentAndEvent(student, event)
+            .orElseThrow { RestApiException(ErrorCode.UNAUTHORIZED_CHECK_IN) }
+        return eventStudent
+    }
+
+    fun insertStudent(adminId: Long, request: InsertEventStudentRequest) {
+        val event = eventRepository.findById(request.eventId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
+
+        validateEventOwner(adminId, event)
+
+        val student = studentRepository.findById(request.studentId)
+            .orElseGet {
+                studentRepository.save(
+                    Student.builder()
+                        .id(request.studentId)
+                        .name(request.studentName)
+                        .build()
+                )
+            }
+
+        eventStudentRepository.findByStudentAndEvent(student, event).ifPresent {
+            throw RestApiException(ErrorCode.ALREADY_INSERTED_STUDENT)
+        }
+
+        val eventStudent = EventStudent.builder()
+            .event(event)
+            .student(student)
+            .build()
+        eventStudentRepository.save(eventStudent)
+
+        val eventStudentBandName = EventStudentBandName.builder()
+            .eventStudent(eventStudent)
+            .bandName("무소속")
+            .build()
+        eventStudentBandNameRepository.save(eventStudentBandName)
+    }
+
     private fun validateEventOwner(adminId: Long, event: Event): Boolean {
         if (!event.isOwner(adminId)) throw RestApiException(ErrorCode.UNAUTHORIZED_EVENT)
         return true
+    }
+
+    fun deleteStudent(adminId: Long, eventId: Long, studentId: String) {
+        val event = eventRepository.findById(eventId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
+
+        validateEventOwner(adminId, event)
+
+        val student = studentRepository.findById(studentId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_STUDENT) }
+
+        val eventStudent = eventStudentRepository.findByStudentAndEvent(student, event)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT_STUDENT) }
+
+        eventStudentBandNameRepository.deleteByEventStudent(eventStudent)
+        eventStudentRepository.delete(eventStudent)
     }
 }

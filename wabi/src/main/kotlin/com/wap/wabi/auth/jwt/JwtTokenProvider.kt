@@ -3,15 +3,13 @@ package com.wap.wabi.auth.jwt
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
-import org.springframework.context.annotation.PropertySource
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.User
+import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
 import java.sql.Timestamp
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.*
+import java.util.Date
 import javax.crypto.spec.SecretKeySpec
 
 @Component
@@ -48,5 +46,10 @@ class JwtTokenProvider(
             validateTokenAndGetSubject(token) ?: throw IllegalArgumentException("Invalid token")
         val (username) = subject.split(":")
         return username
+    }
+
+    fun getAdminName(): String {
+        val authentication = SecurityContextHolder.getContext().authentication
+        return authentication.name
     }
 }

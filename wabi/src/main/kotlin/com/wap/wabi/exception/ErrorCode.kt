@@ -26,6 +26,7 @@ enum class ErrorCode(
     NOT_FOUND_BAND(HttpStatus.NOT_FOUND, "404-1", "밴드Id를 확인해주세요."),
     NOT_FOUND_EVENT(HttpStatus.NOT_FOUND, "404-2", "이벤트Id를 확인해주세요."),
     NOT_FOUND_STUDENT(HttpStatus.NOT_FOUND, "404-3", "학번을 확인해주세요."),
+    NOT_FOUND_EVENT_STUDENT(HttpStatus.NOT_FOUND, "404-4", "학번과 이벤트id를 확인해주세요."),
 
     METHOD_NOT_ALLOWED(HttpStatus.METHOD_NOT_ALLOWED, "405", "Not allowed method."),
 
@@ -33,6 +34,7 @@ enum class ErrorCode(
 
     //EVENT관련
     ALREADY_CHECK_IN(HttpStatus.BAD_REQUEST, "600-1", "이미 체크인 했습니다."),
+    ALREADY_INSERTED_STUDENT(HttpStatus.BAD_REQUEST, "600-2", "이미 등록된 학생입니다."),
 
     //BANT관련
     ALREADY_ADD_STUDENT(HttpStatus.BAD_REQUEST, "700-1", "해당 밴드에 이미 학생들이 존재합니다."),
