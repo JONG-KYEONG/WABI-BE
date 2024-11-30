@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -74,6 +75,19 @@ class EventCommandController(
         eventCommandService.checkIn(checkInRequest = checkInRequest)
 
         val response = Response.ok()
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
+    @PatchMapping("/check-in-manual")
+    @Operation(summary = "수동 체크인")
+    fun patchCheckIn(@RequestBody checkInRequest: CheckInRequest): ResponseEntity<Response> {
+        val added = eventCommandService.patchCheckIn(checkInRequest = checkInRequest)
+
+        if (added) {
+            val response = Response.ok(message = "체크인 완료")
+            return ResponseEntity(response, HttpStatus.OK)
+        }
+        val response = Response.ok(message = "체크인 제거")
         return ResponseEntity(response, HttpStatus.OK)
     }
 }

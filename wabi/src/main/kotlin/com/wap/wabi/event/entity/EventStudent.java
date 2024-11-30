@@ -86,6 +86,21 @@ public class EventStudent {
         return this.status;
     }
 
+    public boolean patchCheckIn() {
+        if (isCheckedIn()) {
+            this.status = EventStudentStatus.NOT_CHECK_IN;
+            this.checkedInAt = null;
+            return true;
+        }
+        this.status = EventStudentStatus.CHECK_IN;
+        this.checkedInAt = LocalDateTime.now();
+        return false;
+    }
+
+    private boolean isCheckedIn() {
+        return this.status == EventStudentStatus.CHECK_IN;
+    }
+
     public Long getId() {
         return id;
     }
@@ -100,10 +115,6 @@ public class EventStudent {
 
     public EventStudentStatus getStatus() {
         return status;
-    }
-
-    public LocalDateTime getUpdatedAt() {
-        return updatedAt;
     }
 
     public LocalDateTime getCheckedInAt() {

@@ -33,20 +33,12 @@ class EventCommandService(
 ) {
     @Transactional
     fun checkIn(checkInRequest: CheckInRequest): EventStudentStatus {
-        //TODO 해당 이벤트에 체크인할 권한이 있는지 검증 필요.
-
-        val student = studentRepository.findById(checkInRequest.studentId)
-            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_STUDENT) }
-        val event = eventRepository.findById(checkInRequest.eventId)
-            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
-        val eventStudent = eventStudentRepository.findByStudentAndEvent(student, event)
-            .orElseThrow { RestApiException(ErrorCode.UNAUTHORIZED_CHECK_IN) }
+        val eventStudent = findEventStudent(checkInRequest)
 
         if (eventStudent.status.equals(EventStudentStatus.CHECK_IN)) {
             throw RestApiException(ErrorCode.ALREADY_CHECK_IN)
         }
         return eventStudent.checkIn()
-
     }
 
     @Transactional
@@ -136,5 +128,22 @@ class EventCommandService(
     private fun validateEventOwner(adminId: Long, event: Event): Boolean {
         if (!event.isOwner(adminId)) throw RestApiException(ErrorCode.UNAUTHORIZED_EVENT)
         return true
+    }
+
+    @Transactional
+    fun patchCheckIn(checkInRequest: CheckInRequest): Boolean {
+        val eventStudent = findEventStudent(checkInRequest)
+
+        return eventStudent.patchCheckIn()
+    }
+
+    private fun findEventStudent(checkInRequest: CheckInRequest): EventStudent {
+        val student = studentRepository.findById(checkInRequest.studentId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_STUDENT) }
+        val event = eventRepository.findById(checkInRequest.eventId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_EVENT) }
+        val eventStudent = eventStudentRepository.findByStudentAndEvent(student, event)
+            .orElseThrow { RestApiException(ErrorCode.UNAUTHORIZED_CHECK_IN) }
+        return eventStudent
     }
 }
