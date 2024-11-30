@@ -57,21 +57,6 @@ public class EventStudent {
             return this;
         }
 
-        public builder status(EventStudentStatus status) {
-            this.status = status;
-            return this;
-        }
-
-        public builder updatedAt(LocalDateTime updatedAt) {
-            this.updatedAt = updatedAt;
-            return this;
-        }
-
-        public builder checkedInAt(LocalDateTime checkedInAt) {
-            this.checkedInAt = checkedInAt;
-            return this;
-        }
-
         public EventStudent build() {
             return new EventStudent(this);
         }
