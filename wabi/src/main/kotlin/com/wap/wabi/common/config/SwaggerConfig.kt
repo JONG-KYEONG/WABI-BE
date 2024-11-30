@@ -30,8 +30,15 @@ class SwaggerConfig {
                     .scheme("bearer")
                     .bearerFormat("JWT")
             )
+
+        val server = Server()
+        server.url = "https://zepelown.site"
+
+        val localServer = Server()
+        localServer.url = "http://localhost:8080"
+
         return OpenAPI()
-            .addServersItem(Server().url("https://zepelown.site"))
+            .servers(listOf(server, localServer))
             .info(info)
             .addSecurityItem(securityRequirement)
             .components(components)
