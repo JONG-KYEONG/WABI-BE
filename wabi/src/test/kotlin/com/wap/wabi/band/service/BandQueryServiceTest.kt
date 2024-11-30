@@ -26,9 +26,9 @@ import java.util.Optional
 @Transactional
 @SpringBootTest
 @SuppressWarnings("NonAsciiCharacters")
-class BandServiceTest {
+class BandQueryServiceTest {
     @Autowired
-    private lateinit var bandService: BandService
+    private lateinit var bandQueryService: BandQueryService
 
     @MockBean
     private lateinit var bandRepository: BandRepository
@@ -54,7 +54,7 @@ class BandServiceTest {
         `when`(bandStudentRepository.findAllByBand(band)).thenReturn(bandStudents)
 
         // When
-        val result = bandService.getBandStudents(bandId)
+        val result = bandQueryService.getBandStudents(bandId)
 
         // Then
         assertAll(
@@ -73,7 +73,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.getBandStudents(invalidBandId)
+            bandQueryService.getBandStudents(invalidBandId)
         }
 
         // Then
@@ -96,7 +96,7 @@ class BandServiceTest {
 
         //When & Then
         Assertions.assertDoesNotThrow {
-            bandService.createBand(adminId = adminId, bandCreateRequest = bandCreateRequest)
+            bandQueryService.createBand(adminId = adminId, bandCreateRequest = bandCreateRequest)
         }
     }
 
@@ -112,7 +112,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.createBand(adminId = invalidAdminId, bandCreateRequest = bandCreateRequest)
+            bandQueryService.createBand(adminId = invalidAdminId, bandCreateRequest = bandCreateRequest)
         }
 
         // Then
@@ -132,7 +132,7 @@ class BandServiceTest {
 
         //When & Then
         Assertions.assertDoesNotThrow {
-            bandService.deleteBand(adminId = adminId, bandId = bandId)
+            bandQueryService.deleteBand(adminId = adminId, bandId = bandId)
         }
     }
 
@@ -146,7 +146,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.deleteBand(adminId = adminId, bandId = adminId)
+            bandQueryService.deleteBand(adminId = adminId, bandId = adminId)
         }
 
         // Then
@@ -164,7 +164,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.deleteBand(adminId = adminId, bandId = bandId)
+            bandQueryService.deleteBand(adminId = adminId, bandId = bandId)
         }
 
         // Then
@@ -184,7 +184,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.deleteBand(adminId = invalidAdminId, bandId = bandId)
+            bandQueryService.deleteBand(adminId = invalidAdminId, bandId = bandId)
         }
 
         // Then
@@ -211,7 +211,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.deleteBand(adminId = adminId, bandId = bandId)
+            bandQueryService.deleteBand(adminId = adminId, bandId = bandId)
         }
 
         // Then
@@ -234,7 +234,7 @@ class BandServiceTest {
         `when`(bandRepository.findAllByAdminId(adminId)).thenReturn(listOf(band1, band2))
 
         // When
-        val result = bandService.getBands(adminId = adminId)
+        val result = bandQueryService.getBands(adminId = adminId)
 
         // Then
         assertAll(
@@ -252,7 +252,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.getBands(adminId = invalidAdminId)
+            bandQueryService.getBands(adminId = invalidAdminId)
         }
 
         // Then
@@ -275,7 +275,7 @@ class BandServiceTest {
 
         //When & Then
         Assertions.assertDoesNotThrow {
-            bandService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
+            bandQueryService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
         }
     }
 
@@ -294,7 +294,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
+            bandQueryService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
         }
 
         // Then
@@ -317,7 +317,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.updateBand(adminId = invalidAdminId, bandUpdateRequest = bandUpdateRequest)
+            bandQueryService.updateBand(adminId = invalidAdminId, bandUpdateRequest = bandUpdateRequest)
         }
 
         // Then
@@ -340,7 +340,7 @@ class BandServiceTest {
 
         // When
         val exception = assertThrows<RestApiException> {
-            bandService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
+            bandQueryService.updateBand(adminId = adminId, bandUpdateRequest = bandUpdateRequest)
         }
 
         // Then
