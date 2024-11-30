@@ -6,6 +6,7 @@ import com.wap.wabi.common.payload.response.Response
 import com.wap.wabi.event.payload.request.CheckInRequest
 import com.wap.wabi.event.payload.request.EventCreateRequest
 import com.wap.wabi.event.payload.request.EventUpdateRequest
+import com.wap.wabi.event.payload.request.InsertEventStudentRequest
 import com.wap.wabi.event.service.EventCommandService
 import io.swagger.v3.oas.annotations.Operation
 import org.springframework.http.HttpStatus
@@ -88,6 +89,34 @@ class EventCommandController(
             return ResponseEntity(response, HttpStatus.OK)
         }
         val response = Response.ok(message = "체크인 제거")
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
+    @PostMapping("/students")
+    @Operation(summary = "이벤트 학생 수동 추가")
+    fun insertStudent(
+        @RequestBody request: InsertEventStudentRequest
+    ): ResponseEntity<Response> {
+        val adminName = jwtTokenProvider.getAdminName()
+        val adminId = adminService.getAdminId(adminName = adminName)
+        eventCommandService.insertStudent(adminId = adminId, request = request)
+
+        val response = Response.ok(message = "success insert student")
+        return ResponseEntity(response, HttpStatus.OK)
+    }
+
+    @DeleteMapping("/students/{eventId}/{studentId}")
+    @Operation(summary = "이벤트 학생 수동 삭제")
+    fun deleteStudent(
+        @RequestHeader("Authorization") token: String,
+        @PathVariable eventId: Long,
+        @PathVariable studentId: String
+    ): ResponseEntity<Response> {
+        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminId = adminService.getAdminId(adminName = adminName)
+        eventCommandService.deleteStudent(adminId = adminId, eventId = eventId, studentId = studentId)
+
+        val response = Response.ok(message = "success create event")
         return ResponseEntity(response, HttpStatus.OK)
     }
 }
