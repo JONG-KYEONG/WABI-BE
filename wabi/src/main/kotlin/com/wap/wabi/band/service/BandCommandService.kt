@@ -1,9 +1,12 @@
 package com.wap.wabi.band.service
 
+import com.wap.wabi.auth.admin.repository.AdminRepository
 import com.wap.wabi.band.entity.Band
 import com.wap.wabi.band.entity.BandStudent
 import com.wap.wabi.band.payload.BandStudentDto
+import com.wap.wabi.band.payload.request.BandCreateRequest
 import com.wap.wabi.band.payload.request.BandStudentEnrollRequest
+import com.wap.wabi.band.payload.request.BandUpdateRequest
 import com.wap.wabi.band.repository.BandRepository
 import com.wap.wabi.band.repository.BandStudentRepository
 import com.wap.wabi.exception.ErrorCode
@@ -19,8 +22,55 @@ class BandCommandService(
     private val bandRepository: BandRepository,
     private val bandStudentRepository: BandStudentRepository,
     private val studentRepository: StudentRepository,
-    private val fileToBandStudentTranslator: FileToBandStudentTranslator
+    private val fileToBandStudentTranslator: FileToBandStudentTranslator,
+    private val adminRepository: AdminRepository
 ) {
+    @Transactional
+    fun createBand(adminId: Long, bandCreateRequest: BandCreateRequest) {
+        val admin = adminRepository.findById(adminId)
+
+        if (admin.isEmpty) {
+            throw RestApiException(ErrorCode.UNAUTHORIZED_REQUEST)
+        }
+
+        val createBand = bandCreateRequest.toBand(admin.get().id)
+
+        bandRepository.save(createBand)
+    }
+
+    @Transactional
+    fun updateBand(adminId: Long, bandUpdateRequest: BandUpdateRequest) {
+        val band = bandRepository.findById(bandUpdateRequest.bandId)
+            .orElseThrow { RestApiException(ErrorCode.NOT_FOUND_BAND) }
+        val admin = adminRepository.findById(adminId)
+
+        if (admin.isEmpty) {
+            throw RestApiException(ErrorCode.UNAUTHORIZED_REQUEST)
+        }
+
+        if (band.adminId != admin.get().id) {
+            throw RestApiException(ErrorCode.UNAUTHORIZED_BAND)
+        }
+
+        band.update(bandUpdateRequest)
+    }
+
+    @Transactional
+    fun deleteBand(adminId: Long, bandId: Long) {
+        val band = bandRepository.findById(bandId).orElseThrow { RestApiException(ErrorCode.NOT_FOUND_BAND) }
+        val admin = adminRepository.findById(adminId)
+
+        if (admin.isEmpty) {
+            throw RestApiException(ErrorCode.UNAUTHORIZED_REQUEST)
+        }
+
+        if (band.adminId != admin.get().id) {
+            throw RestApiException(ErrorCode.UNAUTHORIZED_BAND)
+        }
+
+        band.delete()
+    }
+
     fun enrollByFile(bandId: Long, file: MultipartFile): Long {
         val bandStudentDtos = fileToBandStudentTranslator.translateFileToDto(file)
         return enrollByDto(bandId, bandStudentDtos)
