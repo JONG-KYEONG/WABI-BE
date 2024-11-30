@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 
@@ -35,8 +34,8 @@ class BandQueryController(
     @Operation(
         summary = "해당 계정의 밴드 목록을 불러옵니다."
     )
-    fun getBands(@RequestHeader("Authorization") token: String): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+    fun getBands(): ResponseEntity<Response> {
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         val response = Response.ok(data = bandQueryService.getBands(adminId = adminId))
         return ResponseEntity(response, HttpStatus.OK)

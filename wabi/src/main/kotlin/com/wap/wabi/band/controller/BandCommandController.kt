@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestHeader
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
@@ -34,10 +33,9 @@ class BandCommandController(
         summary = "밴드 생성"
     )
     fun createBand(
-        @RequestHeader("Authorization") token: String,
         @RequestBody request: BandCreateRequest
     ): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         bandCommandService.createBand(adminId = adminId, bandCreateRequest = request)
 
@@ -50,10 +48,9 @@ class BandCommandController(
         summary = "밴드 수정"
     )
     fun updateBand(
-        @RequestHeader("Authorization") token: String,
         @RequestBody request: BandUpdateRequest
     ): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         bandCommandService.updateBand(adminId = adminId, bandUpdateRequest = request)
 
@@ -67,10 +64,9 @@ class BandCommandController(
         summary = "밴드 삭제"
     )
     fun deleteBand(
-        @RequestHeader("Authorization") token: String,
         @PathVariable bandId: Long
     ): ResponseEntity<Response> {
-        val adminName = jwtTokenProvider.getAdminNameByToken(token.removePrefix("Bearer "))
+        val adminName = jwtTokenProvider.getAdminName()
         val adminId = adminService.getAdminId(adminName = adminName)
         bandCommandService.deleteBand(adminId = adminId, bandId = bandId)
 
