@@ -52,4 +52,13 @@ jobs:
         cd wabi
         ls
         ./gradlew clean build -x test
+    
+    - name: Docker build
+      run: |
+        docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+        docker build -t seongwonyoon/wabi .
+        docker tag wabi seongwonyoon/wabi:${GITHUB_SHA::7}
+        docker push seongwonyoon/wabi:${GITHUB_SHA::7}
+
+
 
