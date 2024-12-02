@@ -56,6 +56,7 @@ jobs:
     - name: Docker build
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
+        cd wabi
         docker build -t seongwonyoon/wabi .
         docker tag wabi seongwonyoon/wabi:${GITHUB_SHA::7}
         docker push seongwonyoon/wabi:${GITHUB_SHA::7}
