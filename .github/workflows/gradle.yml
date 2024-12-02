@@ -49,5 +49,7 @@ jobs:
     - name: Build with Gradle
       run: |
         ls
-        ./wabi/gradlew clean build -x test
+        cd wabi
+        ls
+        ./gradlew clean build -x test
 
