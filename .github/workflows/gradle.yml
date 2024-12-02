@@ -78,21 +78,22 @@ jobs:
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
           
           # Create .env file in the correct directory
-          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" > ~/wabi/.env
-          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> ~/wabi/.env
-          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> ~/wabi/.env
-          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> ~/wabi/.env
-          echo "JWT_EXPIRATION_HOURS=${{ secrets.JWT_EXPIRATION_HOURS }}" >> ~/wabi/.env
-          echo "JWT_ISSUER=${{ secrets.JWT_ISSUER }}" >> ~/wabi/.env
-          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> ~/wabi/.env
-          echo "DOCKERHUB_REPOSITORY=${{ secrets.DOCKERHUB_REPOSITORY }}" >> ~/wabi/.env
+          echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" > .env
+          echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> .env
+          echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> .env
+          echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> .env
+          echo "JWT_EXPIRATION_HOURS=${{ secrets.JWT_EXPIRATION_HOURS }}" >> .env
+          echo "JWT_ISSUER=${{ secrets.JWT_ISSUER }}" >> .env
+          echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
+          echo "DOCKERHUB_REPOSITORY=${{ secrets.DOCKERHUB_REPOSITORY }}" >> 
 
-          # Navigate to the correct directory for docker-compose
-          cd ~/wabi
-
-          # Bring down any existing containers before bringing up new ones
-          sudo docker-compose down
-          sudo docker-compose up -d          
+          if [ -f "docker-compose.yml" ]; then
+            sudo docker-compose down
+            sudo docker-compose up -d
+          else
+            echo "docker-compose.yml not found in the current directory."
+            exit 1
+          fi 
           
 
 
