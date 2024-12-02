@@ -57,10 +57,24 @@ jobs:
       run: |
         docker login -u ${{ secrets.DOCKER_USERNAME }} -p ${{ secrets.DOCKER_PASSWORD }}
         cd wabi
-        docker build -t seongwonyoon/wabi:latest .  # 이미지에 latest 태그를 추가
-        docker tag seongwonyoon/wabi:latest seongwonyoon/wabi:${GITHUB_SHA::7}  # GITHUB_SHA를 이용한 커밋 태그 추가
-        docker push seongwonyoon/wabi:latest  # latest 버전 푸시
-        docker push seongwonyoon/wabi:${GITHUB_SHA::7}  # 커밋 해시 버전 푸시
-
+        docker build -t ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest .  # 이미지에 latest 태그를 추가
+        docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest seongwonyoon/wabi:${GITHUB_SHA::7}  # GITHUB_SHA를 이용한 커밋 태그 추가
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest  # latest 버전 푸시
+        docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}  # 커밋 해시 버전 푸시
+        
+		# Deploy
+    - name: Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SSH_USERNAME }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        passphrase: ${{ secrets.SSH_PASSPHRASE }}
+        envs: GITHUB_SHA
+        script: |
+          sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
+          sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          sudo docker tag ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}:${GITHUB_SHA::7}
+          sudo docker-compose up -d
 
 
