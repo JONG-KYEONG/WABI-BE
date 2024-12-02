@@ -11,7 +11,8 @@
 <br/>  
 [프론트 깃허브 레포지토리](https://github.com/pknu-wap/WABI-FE)  
 <br/>
-![image](https://github.com/user-attachments/assets/09f8c9f4-2bca-41b8-9850-28e73a1b5397)
+![WABI 최종발표 포스터](https://github.com/user-attachments/assets/78b5d905-0ac5-45ab-90cd-45a838d58228)
+
 
 ## ✨ 기술 스택 (Tech Stack)
 ### 프론트
