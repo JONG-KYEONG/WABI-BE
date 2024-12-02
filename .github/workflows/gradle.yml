@@ -33,8 +33,7 @@ jobs:
     # 환경 변수 설정
     - name: Set environment values
       run: |
-        cd ./wabi/src/main/resources
-        touch ./env.properties
+        touch ./wabi/src/main/resources/env.properties
         echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> ./env.properties
         echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> ./env.properties
         echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> ./env.properties
