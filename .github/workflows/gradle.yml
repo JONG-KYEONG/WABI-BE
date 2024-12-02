@@ -48,5 +48,4 @@ jobs:
     # Gradle build (Test 제외)
     - name: Build with Gradle
       run: ./wabi/gradlew clean build -x test
-      working-directory: ./wabi  # Gradle 빌드를 wabi 폴더 내에서 실행
 
