@@ -2,9 +2,9 @@ name: Deploy
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "ci/cd" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "ci/cd" ]
 
 permissions:
   contents: read
@@ -26,11 +26,9 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
 
-    # Gradle 버전 설치 (Wrapper 없을 경우)
-    - name: Set up Gradle
-      uses: gradle/wrapper-validation-action@v2
-      with:
-        gradle-version: '8.8'  # 필요한 Gradle 버전 설정
+    # Gradlew 실행 허용
+    - name: Grant execute permission for gradlew
+      run: chmod +x ./wabi/gradlew
 
     # 환경 변수 설정
     - name: Set environment values
@@ -47,4 +45,4 @@ jobs:
 
     # Gradle build (Test 제외)
     - name: Build with Gradle
-      run: ./wabi/gradlew clean build -x test  # Gradle Wrapper로 빌드
+      run: ./wabi/gradlew clean build -x test
