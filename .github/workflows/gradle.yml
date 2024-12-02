@@ -62,7 +62,7 @@ jobs:
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:latest  # latest 버전 푸시
         docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}  # 커밋 해시 버전 푸시
         
-		# Deploy
+    # Deploy
     - name: Deploy
       uses: appleboy/ssh-action@master
       with:
