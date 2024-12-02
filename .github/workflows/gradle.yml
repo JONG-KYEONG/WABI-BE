@@ -21,7 +21,7 @@ jobs:
 
     # Gradlew 실행 허용
     - name: Run chmod to make gradlew executable
-      run: chmod +x ./gradlew
+      run: chmod +x ./wabi/gradlew
 
     # JDK 17 세팅
     - name: Set up JDK 17
@@ -33,7 +33,7 @@ jobs:
     # 환경 변수 설정
     - name: Set environment values
       run: |
-        cd ./src/main/resources
+        cd ./wabi/src/main/resources
         touch ./env.properties
         echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" >> ./env.properties
         echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> ./env.properties
@@ -48,3 +48,4 @@ jobs:
       uses: gradle/gradle-build-action@v3
       with:
         arguments: clean build -x test
+        working-directory: ./wabi
