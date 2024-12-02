@@ -47,5 +47,7 @@ jobs:
 
     # Gradle build (Test 제외)
     - name: Build with Gradle
-      run: ./wabi/gradlew clean build -x test
+      run: |
+        ls
+        ./wabi/gradlew clean build -x test
 
