@@ -72,6 +72,8 @@ jobs:
         passphrase: ${{ secrets.SSH_PASSPHRASE }}
         envs: GITHUB_SHA
         script: |
+          ls
+          cd ~
           sudo docker login -u ${{ secrets.DOCKERHUB_USERNAME }} -p ${{ secrets.DOCKERHUB_PASSWORD }}
           sudo docker pull ${{ secrets.DOCKERHUB_USERNAME }}/${{ secrets.DOCKERHUB_REPOSITORY }}
           echo "SPRING_DATASOURCE_URL=${{ secrets.SPRING_DATASOURCE_URL }}" > .env
@@ -83,5 +85,6 @@ jobs:
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" >> .env
           echo "DOCKERHUB_REPOSITORY=${{ secrets.DOCKERHUB_REPOSITORY }}" >> .env
           sudo docker-compose up -d
+          
 
 
