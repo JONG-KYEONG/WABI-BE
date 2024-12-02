@@ -18,6 +18,9 @@ jobs:
     # 기본 체크아웃
     - name: Checkout
       uses: actions/checkout@v3
+    # 폴더 정보 확인
+    - name: List the repository structure
+      run: ls -R
 
     # JDK 17 세팅
     - name: Set up JDK 17
