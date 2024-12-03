@@ -82,10 +82,6 @@
 - 존재한다면 출석체크를 할 수 있습니다.
 
 ### CI/CD
-
-#### 프론트
-준비 예정
-#### 백엔드
 ![image](https://github.com/user-attachments/assets/e77fef6c-2945-46bf-8474-a950e0a49df2)
 
 
