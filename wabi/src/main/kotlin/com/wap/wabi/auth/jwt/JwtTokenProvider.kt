@@ -1,27 +1,37 @@
 package com.wap.wabi.auth.jwt
 
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.wap.wabi.auth.admin.repository.AdminRefreshTokenRepository
+import io.jsonwebtoken.ExpiredJwtException
 import io.jsonwebtoken.Jwts
 import io.jsonwebtoken.SignatureAlgorithm
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.stereotype.Component
+import org.springframework.transaction.annotation.Transactional
 import java.sql.Timestamp
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
-import java.util.Date
+import java.util.*
 import javax.crypto.spec.SecretKeySpec
 
 @Component
 class JwtTokenProvider(
     @Value("\${jwt.secret-key}")
     private val secretKey: String,
-    @Value("\${jwt.expiration-hours}")
-    private val expirationHours: Long,
+    @Value("\${jwt.expiration-minutes}")
+    private val expirationMinutes: Long,
+    @Value("\${jwt.refresh-expiration-hours}")
+    private val refreshExpirationHours: Long,
     @Value("\${jwt.issuer}")
-    private val issuer: String
+    private val issuer: String,
+    private val adminRefreshTokenRepository: AdminRefreshTokenRepository
 ) {
-    fun createToken(userSpecification: String) = Jwts.builder()
+    private val reissueLimit = refreshExpirationHours * 60 / expirationMinutes
+    private val objectMapper = ObjectMapper()
+
+    fun createAccessToken(userSpecification: String) = Jwts.builder()
         .signWith(
             SecretKeySpec(
                 secretKey.toByteArray(),
@@ -31,7 +41,7 @@ class JwtTokenProvider(
         .setSubject(userSpecification)   // JWT 토큰 제목
         .setIssuer(issuer)    // JWT 토큰 발급자
         .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))    // JWT 토큰 발급 시간
-        .setExpiration(Date.from(Instant.now().plus(expirationHours, ChronoUnit.HOURS)))    // JWT 토큰의 만료시간 설정
+        .setExpiration(Date.from(Instant.now().plus(expirationMinutes, ChronoUnit.MINUTES)))    // JWT 토큰의 만료시간 설정
         .compact()!!    // JWT 토큰 생성
 
     fun validateTokenAndGetSubject(token: String): String? = Jwts.parserBuilder()
@@ -41,15 +51,69 @@ class JwtTokenProvider(
         .body
         .subject
 
-    fun getAdminNameByToken(token: String): String {
-        val subject =
-            validateTokenAndGetSubject(token) ?: throw IllegalArgumentException("Invalid token")
-        val (username) = subject.split(":")
-        return username
-    }
-
     fun getAdminName(): String {
         val authentication = SecurityContextHolder.getContext().authentication
         return authentication.name
     }
+
+    fun createRefreshToken() = Jwts.builder()
+        .signWith(SecretKeySpec(secretKey.toByteArray(), SignatureAlgorithm.HS512.jcaName))
+        .setIssuer(issuer)
+        .setIssuedAt(Timestamp.valueOf(LocalDateTime.now()))
+        .setExpiration(Date.from(Instant.now().plus(refreshExpirationHours, ChronoUnit.HOURS)))
+        .compact()!!
+
+    @Transactional
+    fun recreateAccessToken(oldAccessToken: String): String {
+        val subject = decodeJwtPayloadSubject(oldAccessToken)
+        adminRefreshTokenRepository.findAdminRefreshTokenByAdminNameAndReissueCountLessThan(
+            (subject.split(':')[0]),
+            reissueLimit
+        ).ifPresentOrElse(
+            { it.increaseReissueCount() },
+            { throw ExpiredJwtException(null, null, "레프레시 토큰이 만료되었습니다.") }
+        )
+        return createAccessToken(subject)
+    }
+
+    @Transactional(readOnly = true)
+    fun validateRefreshToken(refreshToken: String, oldAccessToken: String) {
+        validateAndParseToken(refreshToken)
+        val adminName = decodeJwtPayloadSubject(oldAccessToken).split(':')[0]
+        adminRefreshTokenRepository.findAdminRefreshTokenByAdminNameAndReissueCountLessThan(adminName, reissueLimit)
+            .ifPresentOrElse(
+                { it.validateRefreshToken(refreshToken) },
+                { throw ExpiredJwtException(null, null, "레프레시 토큰이 만료되었습니다.") }
+            )
+    }
+
+    fun validateAndParseToken(token: String?) = Jwts.parserBuilder()    // validateTokenAndGetSubject()에서 따로 분리
+        .setSigningKey(secretKey.toByteArray())
+        .build()
+        .parseClaimsJws(token)!!
+
+    @Transactional
+    fun reissueAccessToken(refreshToken: String, oldAccessToken: String): String {
+        // 리프레시 토큰과 기존 액세스 토큰의 유효성 검사
+        validateAndParseToken(refreshToken)
+        val subject = decodeJwtPayloadSubject(oldAccessToken)
+        val adminName = subject.split(':')[0]
+
+        adminRefreshTokenRepository.findAdminRefreshTokenByAdminNameAndReissueCountLessThan(adminName, reissueLimit)
+            .ifPresentOrElse(
+                { it.validateRefreshToken(refreshToken)
+                    it.increaseReissueCount()
+                },
+                { throw ExpiredJwtException(null, null, "Refresh token expired or invalid.") }
+            )
+
+        // 새로운 액세스 토큰 발급
+        return createAccessToken(subject)
+    }
+
+    private fun decodeJwtPayloadSubject(oldAccessToken: String) =
+        objectMapper.readValue(
+            Base64.getUrlDecoder().decode(oldAccessToken.split('.')[1]).decodeToString(),
+            Map::class.java
+        )["sub"].toString()
 }
