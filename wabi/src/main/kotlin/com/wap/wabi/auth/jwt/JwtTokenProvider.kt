@@ -92,25 +92,6 @@ class JwtTokenProvider(
         .build()
         .parseClaimsJws(token)!!
 
-    @Transactional
-    fun reissueAccessToken(refreshToken: String, oldAccessToken: String): String {
-        // 리프레시 토큰과 기존 액세스 토큰의 유효성 검사
-        validateAndParseToken(refreshToken)
-        val subject = decodeJwtPayloadSubject(oldAccessToken)
-        val adminName = subject.split(':')[0]
-
-        adminRefreshTokenRepository.findAdminRefreshTokenByAdminNameAndReissueCountLessThan(adminName, reissueLimit)
-            .ifPresentOrElse(
-                { it.validateRefreshToken(refreshToken)
-                    it.increaseReissueCount()
-                },
-                { throw ExpiredJwtException(null, null, "Refresh token expired or invalid.") }
-            )
-
-        // 새로운 액세스 토큰 발급
-        return createAccessToken(subject)
-    }
-
     private fun decodeJwtPayloadSubject(oldAccessToken: String) =
         objectMapper.readValue(
             Base64.getUrlDecoder().decode(oldAccessToken.split('.')[1]).decodeToString(),
