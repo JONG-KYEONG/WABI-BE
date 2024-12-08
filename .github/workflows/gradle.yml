@@ -2,9 +2,9 @@ name: Deploy
 
 on:
   push:
-    branches: [ "develop" ]
+    branches: [ "Deploy/#52" ]
   pull_request:
-    branches: [ "develop" ]
+    branches: [ "Deploy/#52" ]
 
 permissions:
   contents: read
