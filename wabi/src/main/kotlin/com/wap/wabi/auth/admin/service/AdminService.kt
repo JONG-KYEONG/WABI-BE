@@ -1,11 +1,13 @@
 package com.wap.wabi.auth.admin.service
 
+import com.wap.wabi.auth.admin.entity.AdminRefreshToken
 import com.wap.wabi.auth.admin.payload.request.AdminLoginRequest
 import com.wap.wabi.auth.admin.payload.request.AdminRegisterRequest
 import com.wap.wabi.auth.admin.payload.response.AdminLoginResponse
+import com.wap.wabi.auth.admin.repository.AdminRefreshTokenRepository
 import com.wap.wabi.auth.admin.repository.AdminRepository
-import com.wap.wabi.auth.jwt.JwtTokenProvider
 import com.wap.wabi.auth.admin.util.AdminValidator
+import com.wap.wabi.auth.jwt.JwtTokenProvider
 import com.wap.wabi.exception.ErrorCode
 import com.wap.wabi.exception.RestApiException
 import org.springframework.security.crypto.password.PasswordEncoder
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional
 @Service
 class AdminService(
     private val adminRepository: AdminRepository,
+    private val adminRefreshTokenRepository: AdminRefreshTokenRepository,
     private val tokenProvider: JwtTokenProvider,
     private val adminValidator: AdminValidator,
     private val encoder: PasswordEncoder
@@ -36,11 +39,26 @@ class AdminService(
                 encoder.matches(adminLoginRequest.password, admin.get().password)
             }
             ?: throw RestApiException(ErrorCode.BAD_REQUEST_NOT_EXIST_ADMIN)
-        val token = tokenProvider.createToken("${admin.get().username}:${admin.get().role}")
+        val refreshToken = tokenProvider.createRefreshToken()
+        adminRefreshTokenRepository.findAdminRefreshTokenByAdminName(admin.get().username)
+            .ifPresentOrElse(
+                { it.updateRefreshToken(refreshToken) },
+                {
+                    adminRefreshTokenRepository.save(
+                        AdminRefreshToken.builder()
+                            .adminName(admin.get().username)
+                            .refreshToken(refreshToken)
+                            .build()
+                    )
+                }
+            )
+
+        val accessToken = tokenProvider.createAccessToken("${admin.get().username}:${admin.get().role}")
         return AdminLoginResponse(
             name = admin.get().username,
             role = admin.get().role,
-            token = token
+            accessToken = accessToken,
+            refreshToken = refreshToken
         )
     }
 
