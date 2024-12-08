@@ -41,8 +41,9 @@ jobs:
         echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" >> ./env.properties
         echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" >> ./env.properties
         echo "JWT_KEY=${{ secrets.JWT_KEY }}" >> ./env.properties
-        echo "JWT.EXPIRATION.HOURS=${{ secrets.JWT_EXPIRATION_HOURS }}" >> ./env.properties
-        echo "JWT.ISSUER=${{ secrets.JWT_ISSUER }}" >> ./env.properties
+        echo "JWT_EXPIRATION_MINUTES=${{ secrets.JWT_EXPIRATION_MINUTES }}" >> ./env.properties
+        echo "JWT_REFRESH_EXPIRATION_HOURS=${{ secrets.JWT_REFRESH_EXPIRATION_HOURS }}" >> ./env.properties
+        echo "JWT_ISSUER=${{ secrets.JWT_ISSUER }}" >> ./env.properties
       shell: bash
 
     # Gradle build (Test 제외)
@@ -83,7 +84,8 @@ jobs:
           echo "SPRING_DATASOURCE_USERNAME=${{ secrets.SPRING_DATASOURCE_USERNAME }}" | sudo tee -a .env > /dev/null
           echo "SPRING_DATASOURCE_PASSWORD=${{ secrets.SPRING_DATASOURCE_PASSWORD }}" | sudo tee -a .env > /dev/null
           echo "JWT_KEY=${{ secrets.JWT_KEY }}" | sudo tee -a .env > /dev/null
-          echo "JWT_EXPIRATION_HOURS=${{ secrets.JWT_EXPIRATION_HOURS }}" | sudo tee -a .env > /dev/null
+          echo "JWT_EXPIRATION_MINUTES=${{ secrets.JWT_EXPIRATION_MINUTES }}" | sudo tee -a .env > /dev/null
+          echo "JWT_REFRESH_EXPIRATION_HOURS=${{ secrets.JWT_REFRESH_EXPIRATION_HOURS }}" | sudo tee -a .env > /dev/null
           echo "JWT_ISSUER=${{ secrets.JWT_ISSUER }}" | sudo tee -a .env > /dev/null
           echo "DOCKERHUB_USERNAME=${{ secrets.DOCKERHUB_USERNAME }}" | sudo tee -a .env > /dev/null
           echo "DOCKERHUB_REPOSITORY=${{ secrets.DOCKERHUB_REPOSITORY }}" | sudo tee -a .env > /dev/null
