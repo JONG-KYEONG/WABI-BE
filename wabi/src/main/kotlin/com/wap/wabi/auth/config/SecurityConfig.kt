@@ -29,7 +29,8 @@ class SecurityConfig(
                 .requestMatchers(
                     "/swagger-ui/**",
                     "/v3/api-docs/**",
-                    "/health"
+                    "/health",
+                    "/actuator/**"
                 ).permitAll()
                 .anyRequest().authenticated()
         }.sessionManagement { session ->
