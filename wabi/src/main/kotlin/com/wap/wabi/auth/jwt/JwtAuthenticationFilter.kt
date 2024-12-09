@@ -24,18 +24,13 @@ class JwtAuthenticationFilter(
         response: HttpServletResponse,
         filterChain: FilterChain
     ) {
-        val path = request.requestURI
-        if (path.startsWith("/swagger-ui/") || path.startsWith("/v3") || path.startsWith("/auth")) {
-            filterChain.doFilter(request, response)
-            return
-        }
-
         try {
             parseBearerToken(request, HttpHeaders.AUTHORIZATION)?.let { accessToken ->
                 jwtTokenProvider.validateAndParseToken(accessToken)
 
                 val user = parseUserSpecification(accessToken)
-                val authentication = UsernamePasswordAuthenticationToken.authenticated(user, accessToken, user.authorities)
+                val authentication =
+                    UsernamePasswordAuthenticationToken.authenticated(user, accessToken, user.authorities)
                 authentication.details = WebAuthenticationDetails(request)
                 SecurityContextHolder.getContext().authentication = authentication
             }
@@ -45,9 +40,7 @@ class JwtAuthenticationFilter(
                 return // 새 토큰 발급 후 요청 종료
             }
         } catch (e: Exception) {
-            response.status = HttpServletResponse.SC_UNAUTHORIZED
-            response.writer.write("Invalid Token")
-            return
+            logger.info("No Token")
         }
 
         filterChain.doFilter(request, response)
