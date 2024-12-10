@@ -2,7 +2,7 @@ name: Deploy
 
 on:
   push:
-    branches: [ "develop", "Feat/#53" ]
+    branches: [ "develop" ]
   pull_request:
     branches: [ "develop" ]
   
