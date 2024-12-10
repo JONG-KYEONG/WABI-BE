@@ -45,4 +45,5 @@ enum class ErrorCode(
     BAD_REQUEST_ADMIN_NAME(HttpStatus.BAD_REQUEST, "800-3", "이름이 형식에 맞지 않습니다."),
     BAD_REQUEST_EXIST_ADMIN(HttpStatus.BAD_REQUEST, "800-4", "이미 존재하는 어드민입니다."),
     BAD_REQUEST_NOT_EXIST_ADMIN(HttpStatus.BAD_REQUEST, "800-5", "존재하지 않는 어드민입니다."),
+    BAD_REQUEST_ADMIN_LOGIN(HttpStatus.BAD_REQUEST, "800-6", "일치하는 계정이 없습니다."),
 }

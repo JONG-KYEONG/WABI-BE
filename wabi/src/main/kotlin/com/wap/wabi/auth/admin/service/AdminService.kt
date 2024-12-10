@@ -7,6 +7,7 @@ import com.wap.wabi.auth.admin.payload.response.AdminLoginResponse
 import com.wap.wabi.auth.admin.repository.AdminRefreshTokenRepository
 import com.wap.wabi.auth.admin.repository.AdminRepository
 import com.wap.wabi.auth.admin.util.AdminValidator
+import com.wap.wabi.auth.admin.util.UserActivityManager
 import com.wap.wabi.auth.jwt.JwtTokenProvider
 import com.wap.wabi.exception.ErrorCode
 import com.wap.wabi.exception.RestApiException
@@ -20,7 +21,8 @@ class AdminService(
     private val adminRefreshTokenRepository: AdminRefreshTokenRepository,
     private val tokenProvider: JwtTokenProvider,
     private val adminValidator: AdminValidator,
-    private val encoder: PasswordEncoder
+    private val encoder: PasswordEncoder,
+    private val userActivityManager: UserActivityManager
 ) {
     @Transactional
     fun registerAdmin(adminRegisterRequest: AdminRegisterRequest) {
@@ -36,7 +38,11 @@ class AdminService(
         adminValidator.validateLogin(adminLoginRequest)
         val admin = adminRepository.findByName(adminLoginRequest.name)
             ?.takeIf { admin ->
-                encoder.matches(adminLoginRequest.password, admin.get().password)
+                try {
+                    encoder.matches(adminLoginRequest.password, admin.get().password)
+                } catch (e: Exception) {
+                    throw RestApiException(ErrorCode.BAD_REQUEST_ADMIN_LOGIN)
+                }
             }
             ?: throw RestApiException(ErrorCode.BAD_REQUEST_NOT_EXIST_ADMIN)
         val refreshToken = tokenProvider.createRefreshToken()
@@ -54,6 +60,7 @@ class AdminService(
             )
 
         val accessToken = tokenProvider.createAccessToken("${admin.get().username}:${admin.get().role}")
+        userActivityManager.updateUserActivity(admin.get())
         return AdminLoginResponse(
             name = admin.get().username,
             role = admin.get().role,
