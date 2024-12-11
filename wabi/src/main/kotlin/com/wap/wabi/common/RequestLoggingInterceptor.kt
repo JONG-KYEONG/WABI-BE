@@ -12,7 +12,7 @@ class RequestLoggingInterceptor : HandlerInterceptor {
     private val logger = LoggerFactory.getLogger(RequestLoggingInterceptor::class.java)
 
     override fun preHandle(request: HttpServletRequest, response: HttpServletResponse, handler: Any): Boolean {
-        logger.info("Request received from" + request.remoteAddr + "to" + request.requestURI)
+        logger.info("Request received from " + request.remoteAddr + " to" + request.requestURI)
         return true
     }
 }
