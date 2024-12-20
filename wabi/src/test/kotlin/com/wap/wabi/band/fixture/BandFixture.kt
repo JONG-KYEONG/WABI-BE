@@ -2,11 +2,12 @@ package com.wap.wabi.band.fixture
 
 import com.wap.wabi.band.entity.Band
 import com.wap.wabi.common.Reflection
+import com.wap.wabi.common.TestConstants
 
 object BandFixture {
     fun createBand(name: String): Band {
         return Band.builder()
-            .adminId(1)
+            .adminId(TestConstants.ADMIN_ID)
             .bandName(name)
             .build()
     }
@@ -18,7 +19,7 @@ object BandFixture {
 
     fun createAnotherUserBand(name: String): Band {
         return Band.builder()
-            .adminId(2)
+            .adminId(TestConstants.ANOTHER_ADMIN_ID)
             .bandName(name)
             .build()
     }
