@@ -71,7 +71,7 @@ class JwtAuthenticationFilter(
             val newAccessToken = jwtTokenProvider.recreateAccessToken(oldAccessToken)
 
             // 새 액세스 토큰을 응답 헤더에 추가
-            response.setHeader("New-Access-Token", newAccessToken)
+            response.setHeader("newRefreshToken", newAccessToken)
 
             // SecurityContext에 새 인증 정보 업데이트
             val user = parseUserSpecification(newAccessToken)
