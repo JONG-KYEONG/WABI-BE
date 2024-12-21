@@ -12,7 +12,7 @@ class WebConfig(private val requestLoggingInterceptor: RequestLoggingInterceptor
         registry.addMapping("/**")
             .allowedOrigins(
                 "https://zepelown.site",
-                "https://master--wabicheck.netlify.app/",
+                "https://master--wabicheck.netlify.app",
                 "http://localhost:3000",
                 "http://localhost:8080"
             )
