@@ -13,6 +13,7 @@ class WebConfig(private val requestLoggingInterceptor: RequestLoggingInterceptor
             .allowedOrigins(
                 "https://zepelown.site",
                 "https://master--wabicheck.netlify.app",
+                "https://wabicheck.netlify.app",
                 "http://localhost:3000",
                 "http://localhost:8080"
             )
